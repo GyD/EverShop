@@ -1,11 +1,15 @@
 package GyD.EverShop;
 
+import com.nijiko.coelho.iConomy.*;
 import java.io.File;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
+import org.bukkit.event.server.PluginEvent;
+import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,13 +23,31 @@ import org.bukkit.plugin.PluginManager;
 public class EverShop extends JavaPlugin {
     private final EverShopBlockListener blockListener = new EverShopBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
+    
+    public static final Logger log = Logger.getLogger("Minecraft");
+    
+    /*
+     * On ajoute iConomy
+     * basé sur: http://pastie.org/1604147
+     */
+    public static iConomy iConomy;
+    private Listener Listener = new Listener();
+
+    private class Listener extends ServerListener {
+
+        public Listener() { }
+
+        @Override
+        public void onPluginEnabled(PluginEvent event) {
+            if(event.getPlugin().getDescription().getName().equals("iConomy")) {
+                EverShop.iConomy = (iConomy)event.getPlugin();
+                EverShop.log.info("[MyPlugin] Attached to iConomy.");
+            }
+        }
+    }
 
 
     public void onEnable() {
-    	/*
-    	 * 
-    	 * et mon commit???
-    	 */
         // TODO: Place any custom enable code here including the registration of any events
 
         // Register our events
