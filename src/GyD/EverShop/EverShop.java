@@ -22,7 +22,10 @@ public class EverShop extends JavaPlugin {
 
 
     public void onEnable() {
-    	
+    	/*
+    	 * 
+    	 * et mon commit???
+    	 */
         // TODO: Place any custom enable code here including the registration of any events
 
         // Register our events
