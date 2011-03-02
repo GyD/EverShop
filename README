@@ -1,0 +1,2 @@
+I start craftbukkit with:
+- java -jar -Xms1024M -Xmx1024M -Dfile.encoding=utf-8 craftbukkit.jar nogui
