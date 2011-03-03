@@ -31,17 +31,19 @@ public class EverShopBlockListener extends BlockListener {
     {
     	// get seller
     	Player seller = e.getPlayer();
-    	
-    	// get block type
+    	// get block
     	Block block = e.getBlock();
+    	// get block type
     	Material blockMat = block.getType();
-    	// get block agains type
+    	// get block agains
     	Block blockAgainst = e.getBlockAgainst();
+    	// get block agains type
     	Material blockAgainstMaterial = blockAgainst.getType();
     	
     	// please don't place block on signs!
-    	if ((blockAgainstMaterial.equals(Material.SIGN)) || (blockAgainstMaterial.equals(Material.SIGN_POST)) || (blockAgainstMaterial.equals(Material.WALL_SIGN))){	
-    		e.setCancelled(true);
+    	if ((blockAgainstMaterial.equals(Material.SIGN)) || (blockAgainstMaterial.equals(Material.SIGN_POST)) || (blockAgainstMaterial.equals(Material.WALL_SIGN))){
+    		if( isShop(blockAgainst) )
+    			e.setCancelled(true);
     	}
     	else
     	if (block.equals(Material.CHEST))
@@ -50,15 +52,24 @@ public class EverShopBlockListener extends BlockListener {
     	}
     }
     
-    public void isShop(Block block)
+    public boolean isShop(Block block)
     {
+    	// get the sign
     	Sign sign = (Sign)block.getState();
+    	// get the sign content
     	String[] text = sign.getLines();
+    	// get the underblock
+    	Block underblock = block.getFace(BlockFace.valueOf("DOWN"), 1);
     	
-    	if ((isInt(text[2])) && (isInt(text[1])))
-        {
-    		
-        }
+    	// is this a Shop ?
+    	if( underblock.getType() == Material.CHEST && (isInt(text[2]) && isInt(text[1])))
+    	{
+    		// yes it is
+    		return true;
+    	}
+    	
+    	// no
+    	return false;
     }
 
     public void onSignChange(SignChangeEvent e)
