@@ -3,7 +3,6 @@ package GyD.EverShop;
 import com.nijiko.coelho.iConomy.*;
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
@@ -24,11 +23,9 @@ public class EverShop extends JavaPlugin {
     private final EverShopBlockListener blockListener = new EverShopBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
     
-    public static final Logger log = Logger.getLogger("Minecraft");
-    
     /*
-     * On ajoute iConomy
-     * basé sur: http://pastie.org/1604147
+     * Added 
+     * based on: http://pastie.org/1604147
      */
     public static iConomy iConomy;
     private Listener Listener = new Listener();
@@ -41,29 +38,35 @@ public class EverShop extends JavaPlugin {
         public void onPluginEnabled(PluginEvent event) {
             if(event.getPlugin().getDescription().getName().equals("iConomy")) {
                 EverShop.iConomy = (iConomy)event.getPlugin();
-                EverShop.log.info("[MyPlugin] Attached to iConomy.");
+                System.out.println("[EverShop] Attached to iConomy.");
             }
         }
+    }
+    
+    private void registerEvents() {
+        this.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, Listener, Priority.Monitor, this);
     }
 
 
     public void onEnable() {
-        // TODO: Place any custom enable code here including the registration of any events
-
         // Register our events
         PluginManager pm = getServer().getPluginManager();
-       
+        
+        // register right clics on blocs
+        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, this.blockListener, Event.Priority.Normal, this);
+        
+        // register sign changes
+        pm.registerEvent(Event.Type.SIGN_CHANGE, this.blockListener, Event.Priority.Normal, this);
+        
+        // register block placed
+        pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
+        // (thank you captain obvious ^^) 
 
-        // EXAMPLE: Custom code, here we just output some info so we can check all is well
+        // Return the plugin infos
         PluginDescriptionFile pdfFile = this.getDescription();
         System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
     }
     public void onDisable() {
-        // TODO: Place any custom disable code here
-
-        // NOTE: All registered events are automatically unregistered when a plugin is disabled
-
-        // EXAMPLE: Custom code, here we just output some info so we can check all is well
         System.out.println("Goodbye world!");
     }
     public boolean isDebugging(final Player player) {
