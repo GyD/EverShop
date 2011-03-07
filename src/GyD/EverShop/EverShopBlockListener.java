@@ -112,22 +112,14 @@ public class EverShopBlockListener extends BlockListener {
 	                  }
 	                }
 		    		
-		    		//String[] l1 = text[1].split("[ :-]+");
-	                int prix = Integer.parseInt(text[1]);
+		    		int prix = Integer.parseInt(text[1]);
 	                
 	                //String woolcolor = "0";
 	                
 	                if( item.getType() == Material.WOOL )
 	                {
-	                	//MaterialData data = item.getData();
-	                	 
-	                	/*if (data instanceof Wool) {
-	                	    Wool wool = (Wool)data;
-	                	    DyeColor color = (DyeColor)wool.getColor();
-	                	    seller.sendMessage("You have a " + color + " wool!");
-	                	}
-	                	*/
-	                    
+	                	byte color = (byte)item.getDurability();
+	                	
 	                    /*WHITE 	
 	                    Represents white dye. 
 	                    ORANGE 	
