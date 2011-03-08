@@ -43,9 +43,9 @@ public class EverShop extends JavaPlugin {
         }
     }
     
-    private void registerEvents() {
+   /*private void registerEvents() {
         this.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, Listener, Priority.Monitor, this);
-    }
+    }*/
 
 
     public void onEnable() {
