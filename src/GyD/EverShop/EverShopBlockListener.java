@@ -65,6 +65,30 @@ public class EverShopBlockListener extends BlockListener {
 	    		color = Short.valueOf(vals[1]);
 	    	}
 	    	
+	    	ItemStack prix = new ItemStack(341);
+	    	prix.setAmount(price);
+	    	
+	    	ItemStack recompense = new ItemStack(getItemId(vals[0]));
+	    	recompense.setAmount(sellamount);
+	    	recompense.setDurability(color);
+	    	
+	    	if (!InventoryWorkaround.containsItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense })) {
+    			player.sendMessage("Le coffre est vide");
+    			return ;
+	    	}
+	    	
+	    	if (!InventoryWorkaround.containsItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix })) {
+    			player.sendMessage("Vous n'avez pas assez de Slime");
+    			return ;
+	    	}
+	    	
+	    	
+	    	
+	    	player.updateInventory();
+    	}
+    }
+	    	/*
+	    	
 	    	// get user slimes
 	    	int userslimes = 0;
 	    	// get shop amount
