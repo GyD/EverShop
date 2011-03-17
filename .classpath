@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/projects/iConomy4.1.jar"/>
 	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/projects/bukkit.451_531.jar"/>
+	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/server/craftbukkit.531.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

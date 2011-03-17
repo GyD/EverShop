@@ -7,6 +7,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ContainerBlock;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,13 +37,13 @@ public class EverShopBlockListener extends BlockListener {
     
     public void onBlockRightClick(BlockRightClickEvent e)
     {
-    	if(e.getBlock().getType().equals(Material.SIGN_POST) || e.getBlock().getType().equals(Material.WALL_SIGN)){
+    	if(isShop(e.getBlock())){
     		
-    		// get chest
-    		ContainerBlock chest = (ContainerBlock)e.getBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
-    		
-	    	// get player
+    		// get player
 	    	Player player = e.getPlayer();
+	    	
+	    	// get chest
+    		ContainerBlock chest = (ContainerBlock)e.getBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
 	    	
 	    	//get sign
 	    	Sign sign = (Sign) e.getBlock().getState();
@@ -52,7 +54,8 @@ public class EverShopBlockListener extends BlockListener {
 	    	// get price
 	    	int price = Integer.parseInt(l2.substring(2, l2.length()-7));
 
-	    	int amount = Integer.parseInt(l1.substring(2, 4));
+	    	// get amount of items sold 
+	    	int sellamount = Integer.parseInt(l1.substring(2, 4));
 	    	
 	    	String[] vals = l1.substring(9).split("[ :]+");
 	    	
@@ -62,42 +65,86 @@ public class EverShopBlockListener extends BlockListener {
 	    		color = Short.valueOf(vals[1]);
 	    	}
 	    	
-	    	//ItemStack prix = new ItemStack(341);
-	    	//prix.setAmount(price);
+	    	// get user slimes
+	    	int userslimes = 0;
+	    	// get shop amount
+	    	int count = 0;
 	    	
-	    	ItemStack recompense = new ItemStack(getItemId(vals[0]));
-	    	recompense.setAmount(amount);
-	    	recompense.setDurability(color);
+	    	int first = player.getInventory().first(Material.getMaterial(341));
+    		
+    		// check if the chest is empty or not!
+    		if( first == -1 )
+    		{
+    			player.sendMessage("Vous n'avez pas de Slime");
+    			return ;
+    		}
 	    	
-	    	int slimes = 0;
-	    	
+	    	// count userslimes
 	    	for (int i = player.getInventory().first(Material.getMaterial(341)); i < player.getInventory().getSize(); i++) {
 	    		ItemStack current = player.getInventory().getItem(i);
 	    		
-	    		slimes += current.getAmount();
+	    		userslimes += current.getAmount();
 	    	}
 
-	    	player.sendMessage(slimes+"");
-	    	
-	    	if( slimes >= price )
+	    	// enouth slimes?
+	    	if( userslimes >= price )
 	    	{
-	    		int first = player.getInventory().first(Material.getMaterial(341));
-	    		ItemStack playeritem = player.getInventory().getItem(first);
+	    		// check if shop have material
+	    		first = chest.getInventory().first(Material.getMaterial(vals[0]));
 	    		
-	    		player.sendMessage(playeritem.getAmount()+"");
-	    		
-	    		if( playeritem.getAmount() > price )
+	    		// check if the chest is empty or not!
+	    		if( first == -1 )
 	    		{
-	    			int amount1 = playeritem.getAmount();
-	    			playeritem.setAmount(price);
-	    			chest.getInventory().addItem(new ItemStack[] { playeritem });
-	    			playeritem.setAmount(amount1 - price);
+	    			player.sendMessage("Il n'y a plus rien a vendre dans ce coffre! (1)");
+	    			return ;
+	    		}
+	    		
+	    		// get material amount
+	    		for (int i = chest.getInventory().first(Material.getMaterial(vals[0])); i < chest.getInventory().getSize(); i++) {
+		    		ItemStack current = chest.getInventory().getItem(i);
+		    		
+		    		count += current.getAmount();
+		    	}
+	    		
+	    		// check if the chest have enouth
+	    		if( count < sellamount )
+	    		{
+	    			player.sendMessage("Il n'y a plus rien a vendre dans ce coffre!");
+	    			return ;
+	    		}
+	    		
+	    		// get the first item
+	    		ItemStack item = chest.getInventory().getItem(first);
+	    		
+	    		if( item.getAmount() > sellamount )
+	    		{
+	    			int amount1 = item.getAmount();
+	    			item.setAmount(price);
+	    			player.getInventory().addItem(new ItemStack[] { item });
+	    			item.setAmount(amount1 - price);
+	    		}
+	    		
+	    		// check color
+	    		if( item.getDurability() != color )
+	    		{
+	    			player.sendMessage("Il y a une erreur avec ce coffre");
+	    			return ;
+	    		}
+	    		first = player.getInventory().first(Material.getMaterial(341));
+	    		item = player.getInventory().getItem(first);
+	    		
+	    		// 
+	    		if( item.getAmount() > price )
+	    		{
+	    			int amount1 = item.getAmount();
+	    			item.setAmount(price);
+	    			chest.getInventory().addItem(new ItemStack[] { item });
+	    			item.setAmount(amount1 - price);
 	    		}
 	    		else
 	    		{
 	    			int left = price;
 	    			for (int i = player.getInventory().first(Material.getMaterial(341)); i < player.getInventory().getSize(); i++) {
-	    				player.sendMessage(left+"");
 	    				if (left == 0) {
 	                        break;
 	                    }
@@ -111,18 +158,24 @@ public class EverShopBlockListener extends BlockListener {
 	                        current.setAmount(amount1 - left);
 	                        break;
 	    				}
-	    					left -= current.getAmount();
-	                        chest.getInventory().addItem(new ItemStack[] { current });
-	                        player.getInventory().clear(i);
+	    				left -= current.getAmount();
+	                    chest.getInventory().addItem(new ItemStack[] { current });
+	                    player.getInventory().clear(i);
 	    			}
 	    		}
+	    	}
+	    	else
+	    	{
+	    		player.sendMessage("Vous n'avez pas assez de slime");
 	    	}
 	    	
 	    	//player.getInventory().addItem(new ItemStack[] { objet });
 	    	
 	    	//player.sendMessage(""+objet);
+	    	CraftPlayer cPlayer = ((CraftPlayer)e.getPlayer());
+	    	cPlayer.getHandle().l();
     	}
-    }
+    }*/
     
     public void onBlockPlace(BlockPlaceEvent e)
     {
@@ -152,17 +205,20 @@ public class EverShopBlockListener extends BlockListener {
     
     public boolean isShop(Block block)
     {
-    	// get the sign
-    	Sign sign = (Sign)block.getState();
-    	// get the sign content
-    	String[] text = sign.getLines();
-    	// get the underblock
-    	Block underblock = block.getFace(BlockFace.valueOf("DOWN"), 1);
-    	
-    	// is this a Shop ?
-    	if( underblock.getType() == Material.CHEST && text[0].equalsIgnoreCase("§a[shop]") ){
-        	// yes it is
-    		return true;
+    	if ((block.getType().equals(Material.SIGN_POST)) || (block.getType().equals(Material.WALL_SIGN)))
+    	{
+	    	// get the sign
+	    	Sign sign = (Sign)block.getState();
+	    	// get the sign content
+	    	String[] text = sign.getLines();
+	    	// get the underblock
+	    	Block underblock = block.getFace(BlockFace.valueOf("DOWN"), 1);
+	    	
+	    	// is this a Shop ?
+	    	if( underblock.getType() == Material.CHEST && text[0].equalsIgnoreCase("§a[shop]") ){
+	        	// yes it is
+	    		return true;
+	    	}
     	}
     	
     	// no
