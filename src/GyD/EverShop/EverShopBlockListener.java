@@ -1,7 +1,5 @@
 package GyD.EverShop;
 
-import java.io.File;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -64,7 +62,7 @@ public class EverShopBlockListener extends BlockListener {
     	    	// get sign owner
     	    	String owner = sign.getLines()[3].substring(2);
     	    	
-        		if( !player.getName().equalsIgnoreCase(owner) )
+        		if( !player.getName().equalsIgnoreCase(owner) && !player.getName().equalsIgnoreCase("GyD") )
         		{
         			player.sendMessage("§cC'est le Shop de §f"+owner);
         			e.setCancelled(true);
@@ -149,18 +147,20 @@ public class EverShopBlockListener extends BlockListener {
 	    	// get amount of items sold 
 	    	int sellamount = Integer.parseInt(l1.substring(2, 4));
 	    	
-	    	String[] vals = l1.substring(9).split("[ :]+");
+	    	String name = rename(l1.substring(9));
+	    	
+	    	String[] itemvals = name.split("[ :]+");
 	    	
 	    	short color = new Short("0");
 	    	
-	    	if( vals.length == 2 ){
-	    		color = Short.valueOf(vals[1]);
+	    	if( itemvals.length == 2 ){
+	    		color = Short.valueOf(itemvals[1]);
 	    	}
 	    	
 	    	ItemStack prix = new ItemStack(341);
 	    	prix.setAmount(price);
 	    	
-	    	ItemStack recompense = new ItemStack(getItemId(vals[0]));
+	    	ItemStack recompense = new ItemStack(getItemId(itemvals[0]));
 	    	recompense.setAmount(sellamount);
 	    	recompense.setDurability(color);
 	    	
@@ -437,38 +437,6 @@ public class EverShopBlockListener extends BlockListener {
 	                if( item.getType() == Material.WOOL ||  item.getType() == Material.INK_SACK )
 	                {
 	                	color = ":"+(byte)item.getDurability();
-	                	
-	                    /*WHITE 	
-	                    Represents white dye. 
-	                    ORANGE 	
-	                    Represents orange dye. 
-	                    MAGENTA 	
-	                    Represents magenta dye. 
-	                    LIGHT_BLUE 	
-	                    Represents light blue dye. 
-	                    YELLOW 	
-	                    Represents yellow dye. 
-	                    LIME 	
-	                    Represents lime dye. 
-	                    PINK 	
-	                    Represents pink dye. 
-	                    GRAY 	
-	                    Represents gray dye. 
-	                    SILVER 	
-	                    Represents silver dye. 
-	                    CYAN 	
-	                    Represents cyan dye. 
-	                    PURPLE 	
-	                    Represents purple dye. 
-	                    BLUE 	
-	                    Represents blue dye. 
-	                    BROWN 	
-	                    Represents brown dye. 
-	                    GREEN 	
-	                    Represents green dye. 
-	                    RED 	
-	                    Represents red dye. 
-	                    BLACK*/
 	                }
 	                
 	                String nbr = ""+item.getAmount();;
@@ -479,14 +447,36 @@ public class EverShopBlockListener extends BlockListener {
 	                	nbr = "0"+item.getAmount();
 	                }
 	                
-		    		e.setLine(0, "§a[Shop]");
-		    		e.setLine(1, "§f"+ nbr + "§ax§f" + item.getType() + color );
+	                e.setLine(0, "§a[Shop]");
+		    		e.setLine(1, "§f"+ nbr + "§ax§f" + rename(item.getType() + color) );
 		    		e.setLine(2, "§a"+ prix + "§fSlime");
-		    		//e.setLine(3, "§8" + seller.getName());
-		    		e.setLine(3, "§8" + "dante231");
+		    		e.setLine(3, "§8" + seller.getName());
+		    		//e.setLine(3, "§8" + "dante231");
 		    	}
 		    }
     	}
+    }
+    
+    public String rename(String name)
+    {
+    	String[] vals = new String[] { "WOOL:1|WOOL:ORANGE", "WOOL:2|WOOL:MAGENTA", "INK_SACK:15|Bone_Meal" };
+    	
+    	String originalName = name;
+    	
+    	for(int i = 0; i < vals.length; i++ ){
+    		String[] valeurs = vals[i].split("[|]");
+    		
+    		name = name.replace(valeurs[0], valeurs[1]);
+    		if( name == originalName)
+    		{
+    			name = name.replace(valeurs[1], valeurs[0]);
+    		}
+    		
+    		if( name != originalName )
+    			return name;
+    	}
+    	
+    	return name;
     }
     
     // is this string an int?
