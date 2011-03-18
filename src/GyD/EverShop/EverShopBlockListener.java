@@ -446,9 +446,11 @@ public class EverShopBlockListener extends BlockListener {
 	                {
 	                	nbr = "0"+item.getAmount();
 	                }
+
+	                String name = rename(item.getType() + color);
 	                
 	                e.setLine(0, "§a[Shop]");
-		    		e.setLine(1, "§f"+ nbr + "§ax§f" + rename(item.getType() + color) );
+		    		e.setLine(1, "§f"+ nbr + "§ax§f" + name );
 		    		e.setLine(2, "§a"+ prix + "§fSlime");
 		    		e.setLine(3, "§8" + seller.getName());
 		    		//e.setLine(3, "§8" + "dante231");
@@ -459,11 +461,44 @@ public class EverShopBlockListener extends BlockListener {
     
     public String rename(String name)
     {
-    	String[] vals = new String[] { "WOOL:1|WOOL:ORANGE", "WOOL:2|WOOL:MAGENTA", "INK_SACK:15|Bone_Meal" };
+    	
+    	
+    	String[] vals = new String[] {
+    			"WOOL:1|WOOL:ORANGE",
+    			"WOOL:2|WOOL:MAGENTA",
+    			"WOOL:3|WOOL:LIGHT_BLUE",
+    			"WOOL:4|WOOL:YELLOW",
+    			"WOOL:5|WOOL:LIME",
+    			"WOOL:6|WOOL:PINK",
+    			"WOOL:7|WOOL:GRAY",
+    			"WOOL:8|WOOL:SILVER",
+    			"WOOL:9|WOOL:CYAN",
+    			"WOOL:10|WOOL:PURPLE",
+    			"WOOL:11|WOOL:BLUE",
+    			"WOOL:12|WOOL:BROWN",
+    			"WOOL:13|WOOL:GREEN",
+    			"WOOL:14|WOOL:RED",
+    			"WOOL:15|WOOL:BLACK",
+    			"INK_SACK:0|INK_SAC",
+    			"INK_SACK:1|ROSE_RED",
+    			"INK_SACK:2|CACTUS_GREEN",
+    			"INK_SACK:3|COCOA_BEANS",
+    			"INK_SACK:4|LAPIS_LAZULI",
+    			"INK_SACK:5|PURPLE_DYE",
+    			"INK_SACK:6|CYAN_DYE",
+    			"INK_SACK:7|LIGHT_GRAY_DYE",
+    			"INK_SACK:8|GRAY_DYE",
+    			"INK_SACK:9|PINK_DYE",
+    			"INK_SACK:10|LIME_DYE",
+    			"INK_SACK:11|DANDELION_YELLOW",
+    			"INK_SACK:12|LIGHT_BLUE_DYE",
+    			"INK_SACK:13|MAGENTA_DYE",
+    			"INK_SACK:14|ORANGE_DYE",
+    			"INK_SACK:15|BONE_MEAL" };
     	
     	String originalName = name;
     	
-    	for(int i = 0; i < vals.length; i++ ){
+    	for(int i = vals.length-1; i >= 0; i-- ){
     		String[] valeurs = vals[i].split("[|]");
     		
     		name = name.replace(valeurs[0], valeurs[1]);
