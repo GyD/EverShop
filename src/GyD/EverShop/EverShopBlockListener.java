@@ -139,22 +139,31 @@ public class EverShopBlockListener extends BlockListener {
 	    	boolean restore = false;
 	    	
 	    	String l1 = sign.getLines()[1];
-	    	String l2 = sign.getLines()[2];
+	    	String l2[] = sign.getLines()[2].split("[/]");
 	    	
-	    	// get price
-	    	int price = Integer.parseInt(l2.substring(2, l2.length()-7));
-
-	    	// get amount of items sold 
-	    	int sellamount = Integer.parseInt(l1.substring(2, 4));
+	    	//get price
+	    	int price = Integer.parseInt(l2[1].substring(0, l2[1].length()-6));
 	    	
-	    	String name = rename(l1.substring(9));
+	    	// get amount of items sold
+	    	int sellamount = Integer.parseInt(l2[0]);
 	    	
-	    	String[] itemvals = name.split("[ :]+");
-	    	
+	    	// rename item
+	    	String itemname = rename(l1);
+	    	// separate items/colors
+	    	String[] itemvals = itemname.split("[ :]+");
+	    	// default color
 	    	short color = new Short("0");
 	    	
 	    	if( itemvals.length == 2 ){
-	    		color = Short.valueOf(itemvals[1]);
+	    		if( isInt(itemvals[1]) )
+	    		{
+	    			color = Short.valueOf(itemvals[1]);
+	    		}
+	    		else
+	    		{
+	    			player.sendMessage("§c[Shop] Erreur de format");
+	    			return;
+	    		}
 	    	}
 	    	
 	    	ItemStack prix = new ItemStack(341);
@@ -418,6 +427,8 @@ public class EverShopBlockListener extends BlockListener {
 	    		// is the second line a int (price)
 	    		if( isInt(text[1]) )
 	    		{
+	    			boolean empty = true;
+	    			
 	    			// what do you sell? (what's inside the chest)
 		    		ItemStack item = null;
 	                for (int i = 0; i < chest.getInventory().getSize(); i++) {
@@ -425,9 +436,16 @@ public class EverShopBlockListener extends BlockListener {
 	                    continue;
 	                  }
 	                  if (chest.getInventory().getItem(i).getAmount() > 0) {
+	                	empty = false;
 	                    item = chest.getInventory().getItem(i);
 	                    break;
 	                  }
+	                }
+	                
+	                if( empty )
+	                {
+	                	seller.sendMessage("§cLe coffre ne peut pas être vide");
+	                	return;
 	                }
 		    		
 		    		int prix = Integer.parseInt(text[1]);
@@ -438,20 +456,25 @@ public class EverShopBlockListener extends BlockListener {
 	                {
 	                	color = ":"+(byte)item.getDurability();
 	                }
+	                else if((byte)item.getDurability() != 0)
+	                {
+	                	seller.sendMessage("§cVous ne pouvez pas vendre un objet usagé");
+	                	return;
+	                }
 	                
 	                String nbr = ""+item.getAmount();;
 	                
-	                // on convertit à deux chiffres
+	                /* on convertit à deux chiffres
 	                if( item.getAmount() < 10 )
 	                {
 	                	nbr = "0"+item.getAmount();
-	                }
+	                }*/
 
 	                String name = rename(item.getType() + color);
 	                
 	                e.setLine(0, "§a[Shop]");
-		    		e.setLine(1, "§f"+ nbr + "§ax§f" + name );
-		    		e.setLine(2, "§a"+ prix + "§fSlime");
+		    		e.setLine(1, name );
+		    		e.setLine(2, nbr + "/" +  prix + " Slime");
 		    		e.setLine(3, "§8" + seller.getName());
 		    		//e.setLine(3, "§8" + "dante231");
 		    	}
