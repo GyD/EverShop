@@ -60,6 +60,9 @@ public class EverShop extends JavaPlugin {
         
         // register block placed
         pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
+        
+        // register block placed
+        pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
         // (thank you captain obvious ^^) 
 
         // Return the plugin infos
@@ -81,4 +84,3 @@ public class EverShop extends JavaPlugin {
         debugees.put(player, value);
     }
 }
-

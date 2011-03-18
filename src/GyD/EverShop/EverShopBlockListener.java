@@ -12,7 +12,9 @@ import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -22,6 +24,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
 import org.bukkit.util.config.Configuration;
+
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
+import com.nijiko.coelho.iConomy.system.Bank;
 
 /**
  * EverShop block listener
@@ -35,18 +41,104 @@ public class EverShopBlockListener extends BlockListener {
         this.plugin = plugin;
     }
     
+    public void onBlockDamage(BlockDamageEvent e)
+    {
+		// get player
+    	Player player = e.getPlayer();
+    	
+    	if (isBank(e.getBlock()))
+    	{
+    		if( !player.getName().equalsIgnoreCase("GyD") )
+    		{
+    			player.sendMessage("§cPas touche tit con!");
+    			e.setCancelled(true);
+    		}
+    	}
+    	else
+    	{
+    		if (isShop(e.getBlock()))
+        	{
+    			//get sign
+    	    	Sign sign = (Sign) e.getBlock().getState();
+    	    	
+    	    	// get sign owner
+    	    	String owner = sign.getLines()[3].substring(2);
+    	    	
+        		if( !player.getName().equalsIgnoreCase(owner) )
+        		{
+        			player.sendMessage("§cC'est le Shop de §f"+owner);
+        			e.setCancelled(true);
+        		}
+        	}
+    	}
+    }
+    
     public void onBlockRightClick(BlockRightClickEvent e)
     {
+		// get player
+    	Player player = e.getPlayer();
+    	
+    	if (isBank(e.getBlock()))
+    	{
+    		// how many iConomy coin for a Slime?
+    		int ratio = 1;
+    		
+    		int number = player.getItemInHand().getAmount();
+    		Bank bank = iConomy.getBank();
+    		Account account = bank.getAccount(player.getName());
+    		double balance = account.getBalance();
+    		
+    		if( number == -1 ||  number == 0 )
+    		{
+    			number = 1;
+    		}
+
+    		double price = number*ratio;
+    		
+    		ItemStack prix = new ItemStack(341);
+	    	prix.setAmount(number);
+    		
+    		if( player.getItemInHand().getType().equals(Material.SLIME_BALL) )
+    		{
+    			account.add(price);
+    	    	InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
+    			player.sendMessage("§eDépot de §a"+price+" §e"+bank.getCurrency());
+    			player.sendMessage("§eSolde: §a"+account.getBalance());
+    		}
+    		else
+    		{
+    			if( balance >= price )
+    			{
+	    	    	if( !player.getInventory().addItem(new ItemStack[] { prix }).isEmpty() )
+	    	    	{
+	    	    		player.sendMessage("§cPas de place dans vos poches");
+	    	    	}
+	    	    	else
+	    	    	{
+	    	    		account.subtract(price);
+	    	    		player.sendMessage("§eRetrait de §a"+price+" §e"+bank.getCurrency());
+	        			player.sendMessage("§eSolde: §a"+account.getBalance());
+	    	    	}
+    			}
+    			else
+    			{
+    	    		player.sendMessage("§cPas assez d'argent (§a"+balance+")§c pour un retrait de §a"+price+" §c"+bank.getCurrency());
+    			}
+    		}
+
+	    	player.updateInventory();
+    	}
+    	
     	if(isShop(e.getBlock())){
     		
-    		// get player
-	    	Player player = e.getPlayer();
 	    	
 	    	// get chest
     		ContainerBlock chest = (ContainerBlock)e.getBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
 	    	
 	    	//get sign
 	    	Sign sign = (Sign) e.getBlock().getState();
+	    	
+	    	boolean restore = false;
 	    	
 	    	String l1 = sign.getLines()[1];
 	    	String l2 = sign.getLines()[2];
@@ -73,14 +165,35 @@ public class EverShopBlockListener extends BlockListener {
 	    	recompense.setDurability(color);
 	    	
 	    	if (!InventoryWorkaround.containsItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense })) {
-    			player.sendMessage("Le coffre est vide");
+    			player.sendMessage("§cLe coffre est vide");
     			return ;
 	    	}
 	    	
 	    	if (!InventoryWorkaround.containsItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix })) {
-    			player.sendMessage("Vous n'avez pas assez de Slime");
+    			player.sendMessage("§cVous n'avez pas assez de Slime");
     			return ;
 	    	}
+	    	
+	    	InventoryWorkaround.removeItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense });
+	    	InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
+	    	if( !chest.getInventory().addItem(new ItemStack[] { prix }).isEmpty() )
+	    	{
+	    		player.sendMessage("§cPas de place dans le coffre");
+	    		restore = true;
+	    	}
+	    	
+	    	
+            if( !player.getInventory().addItem(new ItemStack[] { recompense }).isEmpty() )
+	    	{
+	    		player.sendMessage("§cPas de place dans votre inventaire");
+	    		restore = true;
+	    	}
+            
+            if( restore )
+            {
+	    		chest.getInventory().addItem(new ItemStack[] { recompense });
+	    		player.getInventory().addItem(new ItemStack[] { prix });
+            }
 	    	
 	    	
 	    	
@@ -248,6 +361,26 @@ public class EverShopBlockListener extends BlockListener {
     	// no
     	return false;
     }
+    
+    public boolean isBank(Block block)
+    {
+    	if ((block.getType().equals(Material.SIGN_POST)) || (block.getType().equals(Material.WALL_SIGN)))
+    	{
+	    	// get the sign
+	    	Sign sign = (Sign)block.getState();
+	    	// get the sign content
+	    	String[] text = sign.getLines();
+	    	
+	    	// is this a Bank ?
+	    	if( text[0].equalsIgnoreCase("§a[bank]") ){
+	        	// yes it is
+	    		return true;
+	    	}
+    	}
+    	
+    	// no
+    	return false;
+    }
 
     public void onSignChange(SignChangeEvent e)
     {
@@ -259,6 +392,18 @@ public class EverShopBlockListener extends BlockListener {
     	
     	// get sign text
     	String[] text = e.getLines();
+    	
+    	// does the sign contain [Shop] ?
+    	if (
+    			text[0].equalsIgnoreCase("[Bank]")
+    	) {
+    		
+    		if( seller.getName().toString().equalsIgnoreCase("GyD") )
+    		{
+    			e.setLine(0, "§a[Bank]");
+    		}
+    		return;
+    	}
     	
     	// chest under?
     	if( underblock.getType() == Material.CHEST )
@@ -337,7 +482,8 @@ public class EverShopBlockListener extends BlockListener {
 		    		e.setLine(0, "§a[Shop]");
 		    		e.setLine(1, "§f"+ nbr + "§ax§f" + item.getType() + color );
 		    		e.setLine(2, "§a"+ prix + "§fSlime");
-		    		e.setLine(3, "§8" + seller.getName());
+		    		//e.setLine(3, "§8" + seller.getName());
+		    		e.setLine(3, "§8" + "dante231");
 		    	}
 		    }
     	}
