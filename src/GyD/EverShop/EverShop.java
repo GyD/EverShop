@@ -22,6 +22,7 @@ import org.bukkit.plugin.PluginManager;
 public class EverShop extends JavaPlugin {
     private final EverShopBlockListener blockListener = new EverShopBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
+    private final EverShopPlayerListener playerListener = new EverShopPlayerListener(this);
     
     /*
      * Added 
@@ -52,7 +53,7 @@ public class EverShop extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         
         // register right clics on blocs
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, this.blockListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Normal, this);
         
         // register sign changes
         pm.registerEvent(Event.Type.SIGN_CHANGE, this.blockListener, Event.Priority.Normal, this);

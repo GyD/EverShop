@@ -20,11 +20,7 @@ public class EverShopPlayerListener extends PlayerListener {
     private final EverShop plugin;
     //public Configuration EverShopConfig = new Configuration(new File("plugins/EverShop/config.yml"));
 
-    public EverShopPlayerListener(final EverShop plugin) {
-        this.plugin = plugin;
-    }
-    
-    public void onPlayerInteract(PlayerInteractEvent e)
+   public void onPlayerInteract(PlayerInteractEvent e)
     {
         if ( !e.getAction().equals(Action.RIGHT_CLICK_BLOCK) )
         {
@@ -32,8 +28,11 @@ public class EverShopPlayerListener extends PlayerListener {
         }
         // get player
         Player player = e.getPlayer();
+        
+        //get block
+		Block block = e.getClickedBlock();
          
-        if (EverShopBlockListener.isBank(e.getClickedBlock()))
+        if (EverShopBlockListener.isBank(block))
         {
             // how many iConomy coin for a Slime?
             int ratio = 1;
@@ -84,7 +83,7 @@ public class EverShopPlayerListener extends PlayerListener {
             player.updateInventory();
         }
          
-        if(EverShopBlockListener.isShop(e.getClickedBlock())){
+        if(EverShopBlockListener.isShop(block)){
              
              
             // get chest
@@ -166,4 +165,10 @@ public class EverShopPlayerListener extends PlayerListener {
             player.updateInventory();
         }
     }
+   
+   public EverShopPlayerListener(final EverShop plugin) {
+       this.plugin = plugin;
+   }
+   
+   
 }
