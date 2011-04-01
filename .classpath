@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/projects/iConomy4.1.jar"/>
-	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/server/craftbukkit.556.jar"/>
-	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/projects/bukkit.461_556.jar"/>
+	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/server/craftbukkit.617.jar"/>
+	<classpathentry kind="lib" path="/Users/onizuka/Documents/evercraft/projects/bukkit.495_617.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

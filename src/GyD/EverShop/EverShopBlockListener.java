@@ -10,14 +10,15 @@ import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRightClickEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
@@ -71,12 +72,16 @@ public class EverShopBlockListener extends BlockListener {
     	}
     }
     
-    public void onBlockRightClick(BlockRightClickEvent e)
+    public void onPlayerInteract(PlayerInteractEvent e)
     {
+    	if ( !e.getAction().equals(Action.RIGHT_CLICK_BLOCK) )
+        {
+    		return;
+        }
 		// get player
     	Player player = e.getPlayer();
     	
-    	if (isBank(e.getBlock()))
+    	if (isBank(e.getClickedBlock()))
     	{
     		// how many iConomy coin for a Slime?
     		int ratio = 1;
@@ -127,14 +132,14 @@ public class EverShopBlockListener extends BlockListener {
 	    	player.updateInventory();
     	}
     	
-    	if(isShop(e.getBlock())){
+    	if(isShop(e.getClickedBlock())){
     		
 	    	
 	    	// get chest
-    		ContainerBlock chest = (ContainerBlock)e.getBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
+    		ContainerBlock chest = (ContainerBlock)e.getClickedBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
 	    	
 	    	//get sign
-	    	Sign sign = (Sign) e.getBlock().getState();
+	    	Sign sign = (Sign) e.getClickedBlock().getState();
 	    	
 	    	boolean restore = false;
 	    	

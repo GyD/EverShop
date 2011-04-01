@@ -34,7 +34,6 @@ public class EverShop extends JavaPlugin {
 
         public Listener() { }
 
-        @Override
         public void onPluginEnabled(PluginEvent event) {
             if(event.getPlugin().getDescription().getName().equals("iConomy")) {
                 EverShop.iConomy = (iConomy)event.getPlugin();
@@ -53,16 +52,16 @@ public class EverShop extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         
         // register right clics on blocs
-        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, this.blockListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, this.blockListener, Event.Priority.Normal, this);
         
         // register sign changes
         pm.registerEvent(Event.Type.SIGN_CHANGE, this.blockListener, Event.Priority.Normal, this);
         
-        // register block placed
-        pm.registerEvent(Event.Type.BLOCK_PLACED, this.blockListener, Event.Priority.Normal, this);
+        // register block placedBLOCK_PLACED
+        pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
         
         // register block placed
-        pm.registerEvent(Event.Type.BLOCK_DAMAGED, this.blockListener, Event.Priority.Normal, this);
+        pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.blockListener, Event.Priority.Normal, this);
         // (thank you captain obvious ^^) 
 
         // Return the plugin infos
