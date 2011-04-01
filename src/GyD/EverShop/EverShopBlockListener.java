@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
@@ -72,261 +73,6 @@ public class EverShopBlockListener extends BlockListener {
     	}
     }
     
-    public void onPlayerInteract(PlayerInteractEvent e)
-    {
-    	if ( !e.getAction().equals(Action.RIGHT_CLICK_BLOCK) )
-        {
-    		return;
-        }
-		// get player
-    	Player player = e.getPlayer();
-    	
-    	if (isBank(e.getClickedBlock()))
-    	{
-    		// how many iConomy coin for a Slime?
-    		int ratio = 1;
-    		
-    		int number = player.getItemInHand().getAmount();
-    		Bank bank = iConomy.getBank();
-    		Account account = bank.getAccount(player.getName());
-    		double balance = account.getBalance();
-    		
-    		if( number == -1 ||  number == 0 )
-    		{
-    			number = 1;
-    		}
-
-    		double price = number*ratio;
-    		
-    		ItemStack prix = new ItemStack(341);
-	    	prix.setAmount(number);
-    		
-    		if( player.getItemInHand().getType().equals(Material.SLIME_BALL) )
-    		{
-    			account.add(price);
-    	    	InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
-    			player.sendMessage("§eDépot de §a"+price+" §e"+bank.getCurrency());
-    			player.sendMessage("§eSolde: §a"+account.getBalance());
-    		}
-    		else
-    		{
-    			if( balance >= price )
-    			{
-	    	    	if( !player.getInventory().addItem(new ItemStack[] { prix }).isEmpty() )
-	    	    	{
-	    	    		player.sendMessage("§cPas de place dans vos poches");
-	    	    	}
-	    	    	else
-	    	    	{
-	    	    		account.subtract(price);
-	    	    		player.sendMessage("§eRetrait de §a"+price+" §e"+bank.getCurrency());
-	        			player.sendMessage("§eSolde: §a"+account.getBalance());
-	    	    	}
-    			}
-    			else
-    			{
-    	    		player.sendMessage("§cPas assez d'argent (§a"+balance+")§c pour un retrait de §a"+price+" §c"+bank.getCurrency());
-    			}
-    		}
-
-	    	player.updateInventory();
-    	}
-    	
-    	if(isShop(e.getClickedBlock())){
-    		
-	    	
-	    	// get chest
-    		ContainerBlock chest = (ContainerBlock)e.getClickedBlock().getFace(BlockFace.valueOf("DOWN"), 1).getState();
-	    	
-	    	//get sign
-	    	Sign sign = (Sign) e.getClickedBlock().getState();
-	    	
-	    	boolean restore = false;
-	    	
-	    	String l1 = sign.getLines()[1];
-	    	String l2[] = sign.getLines()[2].split("[/]");
-	    	
-	    	//get price
-	    	int price = Integer.parseInt(l2[1].substring(0, l2[1].length()-6));
-	    	
-	    	// get amount of items sold
-	    	int sellamount = Integer.parseInt(l2[0]);
-	    	
-	    	// rename item
-	    	String itemname = rename(l1);
-	    	// separate items/colors
-	    	String[] itemvals = itemname.split("[ :]+");
-	    	// default color
-	    	short color = new Short("0");
-	    	
-	    	if( itemvals.length == 2 ){
-	    		if( isInt(itemvals[1]) )
-	    		{
-	    			color = Short.valueOf(itemvals[1]);
-	    		}
-	    		else
-	    		{
-	    			player.sendMessage("§c[Shop] Erreur de format");
-	    			return;
-	    		}
-	    	}
-	    	
-	    	ItemStack prix = new ItemStack(341);
-	    	prix.setAmount(price);
-	    	
-	    	ItemStack recompense = new ItemStack(getItemId(itemvals[0]));
-	    	recompense.setAmount(sellamount);
-	    	recompense.setDurability(color);
-	    	
-	    	if (!InventoryWorkaround.containsItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense })) {
-    			player.sendMessage("§cLe coffre est vide");
-    			return ;
-	    	}
-	    	
-	    	if (!InventoryWorkaround.containsItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix })) {
-    			player.sendMessage("§cVous n'avez pas assez de Slime");
-    			return ;
-	    	}
-	    	
-	    	InventoryWorkaround.removeItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense });
-	    	InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
-	    	if( !chest.getInventory().addItem(new ItemStack[] { prix }).isEmpty() )
-	    	{
-	    		player.sendMessage("§cPas de place dans le coffre");
-	    		restore = true;
-	    	}
-	    	
-	    	
-            if( !player.getInventory().addItem(new ItemStack[] { recompense }).isEmpty() )
-	    	{
-	    		player.sendMessage("§cPas de place dans votre inventaire");
-	    		restore = true;
-	    	}
-            
-            if( restore )
-            {
-	    		chest.getInventory().addItem(new ItemStack[] { recompense });
-	    		player.getInventory().addItem(new ItemStack[] { prix });
-            }
-	    	
-	    	
-	    	
-	    	player.updateInventory();
-    	}
-    }
-	    	/*
-	    	
-	    	// get user slimes
-	    	int userslimes = 0;
-	    	// get shop amount
-	    	int count = 0;
-	    	
-	    	int first = player.getInventory().first(Material.getMaterial(341));
-    		
-    		// check if the chest is empty or not!
-    		if( first == -1 )
-    		{
-    			player.sendMessage("Vous n'avez pas de Slime");
-    			return ;
-    		}
-	    	
-	    	// count userslimes
-	    	for (int i = player.getInventory().first(Material.getMaterial(341)); i < player.getInventory().getSize(); i++) {
-	    		ItemStack current = player.getInventory().getItem(i);
-	    		
-	    		userslimes += current.getAmount();
-	    	}
-
-	    	// enouth slimes?
-	    	if( userslimes >= price )
-	    	{
-	    		// check if shop have material
-	    		first = chest.getInventory().first(Material.getMaterial(vals[0]));
-	    		
-	    		// check if the chest is empty or not!
-	    		if( first == -1 )
-	    		{
-	    			player.sendMessage("Il n'y a plus rien a vendre dans ce coffre! (1)");
-	    			return ;
-	    		}
-	    		
-	    		// get material amount
-	    		for (int i = chest.getInventory().first(Material.getMaterial(vals[0])); i < chest.getInventory().getSize(); i++) {
-		    		ItemStack current = chest.getInventory().getItem(i);
-		    		
-		    		count += current.getAmount();
-		    	}
-	    		
-	    		// check if the chest have enouth
-	    		if( count < sellamount )
-	    		{
-	    			player.sendMessage("Il n'y a plus rien a vendre dans ce coffre!");
-	    			return ;
-	    		}
-	    		
-	    		// get the first item
-	    		ItemStack item = chest.getInventory().getItem(first);
-	    		
-	    		if( item.getAmount() > sellamount )
-	    		{
-	    			int amount1 = item.getAmount();
-	    			item.setAmount(price);
-	    			player.getInventory().addItem(new ItemStack[] { item });
-	    			item.setAmount(amount1 - price);
-	    		}
-	    		
-	    		// check color
-	    		if( item.getDurability() != color )
-	    		{
-	    			player.sendMessage("Il y a une erreur avec ce coffre");
-	    			return ;
-	    		}
-	    		first = player.getInventory().first(Material.getMaterial(341));
-	    		item = player.getInventory().getItem(first);
-	    		
-	    		// 
-	    		if( item.getAmount() > price )
-	    		{
-	    			int amount1 = item.getAmount();
-	    			item.setAmount(price);
-	    			chest.getInventory().addItem(new ItemStack[] { item });
-	    			item.setAmount(amount1 - price);
-	    		}
-	    		else
-	    		{
-	    			int left = price;
-	    			for (int i = player.getInventory().first(Material.getMaterial(341)); i < player.getInventory().getSize(); i++) {
-	    				if (left == 0) {
-	                        break;
-	                    }
-	    				ItemStack current = player.getInventory().getItem(i);
-	    				
-	    				if( current.getAmount() > left )
-	    				{
-	                        int amount1 = current.getAmount();
-	                        current.setAmount(left);
-	                        chest.getInventory().addItem(new ItemStack[] { current });
-	                        current.setAmount(amount1 - left);
-	                        break;
-	    				}
-	    				left -= current.getAmount();
-	                    chest.getInventory().addItem(new ItemStack[] { current });
-	                    player.getInventory().clear(i);
-	    			}
-	    		}
-	    	}
-	    	else
-	    	{
-	    		player.sendMessage("Vous n'avez pas assez de slime");
-	    	}
-	    	
-	    	//player.getInventory().addItem(new ItemStack[] { objet });
-	    	
-	    	//player.sendMessage(""+objet);
-	    	CraftPlayer cPlayer = ((CraftPlayer)e.getPlayer());
-	    	cPlayer.getHandle().l();
-    	}
-    }*/
     
     public void onBlockPlace(BlockPlaceEvent e)
     {
@@ -354,7 +100,7 @@ public class EverShopBlockListener extends BlockListener {
     }
     
     
-    public boolean isShop(Block block)
+    public static boolean isShop(Block block)
     {
     	if ((block.getType().equals(Material.SIGN_POST)) || (block.getType().equals(Material.WALL_SIGN)))
     	{
@@ -376,7 +122,7 @@ public class EverShopBlockListener extends BlockListener {
     	return false;
     }
     
-    public boolean isBank(Block block)
+    public static boolean isBank(Block block)
     {
     	if ((block.getType().equals(Material.SIGN_POST)) || (block.getType().equals(Material.WALL_SIGN)))
     	{
@@ -487,7 +233,7 @@ public class EverShopBlockListener extends BlockListener {
     	}
     }
     
-    public String rename(String name)
+    public static String rename(String name)
     {
     	
     	
@@ -543,7 +289,7 @@ public class EverShopBlockListener extends BlockListener {
     }
     
     // is this string an int?
-    public boolean isInt(String i)
+    public static boolean isInt(String i)
     {
       try
       {
@@ -553,7 +299,7 @@ public class EverShopBlockListener extends BlockListener {
       return false;
     }
     
-    public int getItemId(String name) {
+    public static int getItemId(String name) {
         Material[] mat = Material.values();
         for (Material m : mat) {
           if (m.name().toLowerCase().startsWith(name.toLowerCase())) {
