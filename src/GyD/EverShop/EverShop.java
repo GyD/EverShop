@@ -23,6 +23,7 @@ public class EverShop extends JavaPlugin {
     private final EverShopBlockListener blockListener = new EverShopBlockListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
     private final EverShopPlayerListener playerListener = new EverShopPlayerListener(this);
+	//private final EverShopEntityListener entityListener = new EverShopEntityListener(this);
     
     /*
      * Added 
@@ -61,8 +62,8 @@ public class EverShop extends JavaPlugin {
         // register block placedBLOCK_PLACED
         pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Event.Priority.Normal, this);
         
-        // register block placed
-        pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.blockListener, Event.Priority.Normal, this);
+        // register block damage
+        pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Event.Priority.Normal, this);
         // (thank you captain obvious ^^) 
 
         // Return the plugin infos
