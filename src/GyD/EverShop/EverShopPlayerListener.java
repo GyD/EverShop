@@ -20,7 +20,8 @@ public class EverShopPlayerListener extends PlayerListener {
     private final EverShop plugin;
     //public Configuration EverShopConfig = new Configuration(new File("plugins/EverShop/config.yml"));
 
-   public void onPlayerInteract(PlayerInteractEvent e)
+   @Override
+public void onPlayerInteract(PlayerInteractEvent e)
     {
         if ( !e.getAction().equals(Action.RIGHT_CLICK_BLOCK) )
         {
@@ -55,7 +56,7 @@ public class EverShopPlayerListener extends PlayerListener {
             if( player.getItemInHand().getType().equals(Material.SLIME_BALL) )
             {
                 account.add(price);
-                InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
+                InventoryWorkaround.removeItem(player.getInventory(), true, new ItemStack[] { prix });
                 player.sendMessage("§eDépot de §a"+price+" §e"+bank.getCurrency());
                 player.sendMessage("§eSolde: §a"+account.getBalance());
             }
@@ -129,18 +130,18 @@ public class EverShopPlayerListener extends PlayerListener {
             recompense.setAmount(sellamount);
             recompense.setDurability(color);
              
-            if (!InventoryWorkaround.containsItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense })) {
+            if (!InventoryWorkaround.containsItem(chest.getInventory(), true, new ItemStack[] { recompense })) {
                 player.sendMessage("§cLe coffre est vide");
                 return ;
             }
              
-            if (!InventoryWorkaround.containsItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix })) {
+            if (!InventoryWorkaround.containsItem(player.getInventory(), true, new ItemStack[] { prix })) {
                 player.sendMessage("§cVous n'avez pas assez de Slime");
                 return ;
             }
              
-            InventoryWorkaround.removeItem((CraftInventory)chest.getInventory(), true, new ItemStack[] { recompense });
-            InventoryWorkaround.removeItem((CraftInventory)player.getInventory(), true, new ItemStack[] { prix });
+            InventoryWorkaround.removeItem(chest.getInventory(), true, new ItemStack[] { recompense });
+            InventoryWorkaround.removeItem(player.getInventory(), true, new ItemStack[] { prix });
             if( !chest.getInventory().addItem(new ItemStack[] { prix }).isEmpty() )
             {
                 player.sendMessage("§cPas de place dans le coffre");

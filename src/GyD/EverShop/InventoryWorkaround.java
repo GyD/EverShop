@@ -4,21 +4,23 @@ package GyD.EverShop;
 // package com.earth2me.essentials;
 
 import java.util.HashMap;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryWorkaround
 {
-  public static int first(CraftInventory ci, ItemStack item, boolean forceDurability, boolean forceAmount)
+  public static int first(Inventory ci, ItemStack item, boolean forceDurability, boolean forceAmount)
   {
     return next(ci, item, 0, forceDurability, forceAmount);
   }
 
-  public static int next(CraftInventory ci, ItemStack item, int start, boolean forceDurability, boolean forceAmount) {
-    CraftItemStack[] inventory = ci.getContents();
+  public static int next(Inventory ci, ItemStack item, int start, boolean forceDurability, boolean forceAmount) {
+    ItemStack[] inventory = ci.getContents();
     for (int i = start; i < inventory.length; i++) {
-      CraftItemStack cItem = inventory[i];
+      ItemStack cItem = inventory[i];
+      if (cItem == null) {
+        continue;
+      }
       if ((item.getTypeId() == cItem.getTypeId()) && ((!forceAmount) || (item.getAmount() == cItem.getAmount())) && ((!forceDurability) || (cItem.getDurability() == item.getDurability()))) {
         return i;
       }
@@ -26,7 +28,7 @@ public class InventoryWorkaround
     return -1;
   }
 
-  public static HashMap<Integer, ItemStack> removeItem(CraftInventory ci, boolean forceDurability, ItemStack[] items) {
+  public static HashMap<Integer, ItemStack> removeItem(Inventory ci, boolean forceDurability, ItemStack[] items) {
     HashMap leftover = new HashMap();
 
     for (int i = 0; i < items.length; i++) {
@@ -45,7 +47,7 @@ public class InventoryWorkaround
           leftover.put(Integer.valueOf(i), item);
           break;
         }
-        CraftItemStack itemStack = ci.getItem(first);
+        ItemStack itemStack = ci.getItem(first);
         int amount = itemStack.getAmount();
 
         if (amount <= toDelete) {
@@ -64,7 +66,7 @@ public class InventoryWorkaround
     return leftover;
   }
 
-  public static boolean containsItem(CraftInventory ci, boolean forceDurability, ItemStack[] items) {
+  public static boolean containsItem(Inventory ci, boolean forceDurability, ItemStack[] items) {
     HashMap leftover = new HashMap();
 
     ItemStack[] combined = new ItemStack[items.length];
@@ -100,7 +102,7 @@ public class InventoryWorkaround
           leftover.put(Integer.valueOf(i), item);
           break;
         }
-        CraftItemStack itemStack = ci.getItem(slot);
+        ItemStack itemStack = ci.getItem(slot);
         int amount = itemStack.getAmount();
 
         if (amount <= mustHave)

@@ -1,16 +1,12 @@
 package GyD.EverShop;
 
 import com.nijiko.coelho.iConomy.*;
-import java.io.File;
 import java.util.HashMap;
 import org.bukkit.entity.Player;
-import org.bukkit.Server;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.event.server.PluginEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -49,7 +45,8 @@ public class EverShop extends JavaPlugin {
     }*/
 
 
-    public void onEnable() {
+    @Override
+	public void onEnable() {
         // Register our events
         PluginManager pm = getServer().getPluginManager();
         
@@ -70,7 +67,8 @@ public class EverShop extends JavaPlugin {
         PluginDescriptionFile pdfFile = this.getDescription();
         System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
     }
-    public void onDisable() {
+    @Override
+	public void onDisable() {
         System.out.println("Goodbye world!");
     }
     public boolean isDebugging(final Player player) {

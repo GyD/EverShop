@@ -2,32 +2,15 @@ package GyD.EverShop;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.ContainerBlock;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Wool;
-import org.bukkit.util.config.Configuration;
-
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
-import com.nijiko.coelho.iConomy.system.Bank;
 
 /**
  * EverShop block listener
@@ -41,7 +24,8 @@ public class EverShopBlockListener extends BlockListener {
         this.plugin = plugin;
     }
     
-    public void onBlockDamage(BlockDamageEvent e)
+    @Override
+	public void onBlockDamage(BlockDamageEvent e)
     {
 		// get player
     	Player player = e.getPlayer();
@@ -74,7 +58,8 @@ public class EverShopBlockListener extends BlockListener {
     }
     
     
-    public void onBlockPlace(BlockPlaceEvent e)
+    @Override
+	public void onBlockPlace(BlockPlaceEvent e)
     {
     	// get seller
     	Player seller = e.getPlayer();
@@ -142,7 +127,8 @@ public class EverShopBlockListener extends BlockListener {
     	return false;
     }
 
-    public void onSignChange(SignChangeEvent e)
+    @Override
+	public void onSignChange(SignChangeEvent e)
     {
     	// get underblock
     	Block underblock = e.getBlock().getFace(BlockFace.valueOf("DOWN"), 1);
