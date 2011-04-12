@@ -50,7 +50,7 @@ public class EverShop extends JavaPlugin {
         // Register our events
         PluginManager pm = getServer().getPluginManager();
         
-        // register right clics on blocs
+        // register player events
         pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Normal, this);
         
         // register sign changes
